@@ -3,14 +3,14 @@ from __future__ import annotations
 import logging
 from dataclasses import replace
 from functools import cached_property
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, Type
 
 import torch
 from torch import Tensor
 
 from tgm.util.logging import _get_logger, _logged_cached_property, log_latency
 
-from ._storage import DGSliceTracker, DGStorage
+from ._storage import DGSliceTracker, DGStorageBase, get_dg_storage_backend
 from .batch import DGBatch
 from .timedelta import TimeDeltaDG
 
@@ -55,14 +55,20 @@ class DGraph:
           copied unless explicitly materialized.
     """
 
-    def __init__(self, data: 'DGData', device: str | torch.device = 'cpu') -> None:  # type: ignore
+    def __init__(
+        self,
+        data: 'DGData',  # type: ignore
+        device: str | torch.device = 'cpu',
+        storage_backend: Optional[Type[DGStorageBase]] = None,
+    ) -> None:
         from tgm.data import DGData  # Avoid circular dependency
 
         if not isinstance(data, DGData):
             raise TypeError(f'DGraph must be initialized with DGData, got {type(data)}')
 
+        backend_cls = storage_backend or get_dg_storage_backend()
         self._time_delta = data.time_delta
-        self._storage = DGStorage(data)
+        self._storage = backend_cls(data)
         self._device = torch.device(device)
         self._slice = DGSliceTracker()
 
@@ -406,7 +412,7 @@ class DGraph:
     @classmethod
     def _from_storage(
         cls,
-        storage: DGStorage,
+        storage: DGStorageBase,
         time_delta: TimeDeltaDG,
         device: torch.device,
         slice: DGSliceTracker,
