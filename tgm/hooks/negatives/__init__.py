@@ -4,3 +4,4 @@ from .tgb_sampler import (
     TGBTHGNegativeEdgeSamplerHook,
     TGBTKGNegativeEdgeSamplerHook,
 )
+from .tguf_sampler import TGUFPrecomputedNegativeEdgeSamplerHook
