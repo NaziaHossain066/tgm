@@ -1,4 +1,4 @@
-from typing import Union, Type
+from typing import Any, Union, Type
 import inspect
 
 from .base import DGStorageBase, DGSliceTracker
@@ -11,6 +11,26 @@ logger = _get_logger(__name__)
 
 def get_dg_storage_backend() -> Type:
     return DGStorage
+
+
+def resolve_dg_storage_backend(data: Any) -> Type:
+    """Resolve the storage backend for the given data.
+
+    Resolution order:
+        1. Use the first registered backend whose `accepts(data)` method
+           returns `True`.
+        2. Otherwise, fall back to the process-wide default backend. 
+
+    Args:
+        data: Data instance for which to resolve a storage backend.
+
+    Returns:
+        The resolved storage backend instance.
+    """
+    for backend_cls in DGStorageBackends.values():
+        if backend_cls.accepts(data):
+            return backend_cls
+    return get_dg_storage_backend()
 
 
 def set_dg_storage_backend(backend: Union[str, DGStorageBase]) -> None:
@@ -34,4 +54,5 @@ __all__ = [
     'DGSliceTracker',
     'get_dg_storage_backend',
     'set_dg_storage_backend',
+    'resolve_dg_storage_backend',
 ]

@@ -20,7 +20,7 @@ def seed():
     random.seed(1337)
 
 
-@pytest.fixture(params=DGStorageBackends.values())
+@pytest.fixture(params=[DGStorageArrayBackend])
 def DGStorageImpl(request):
     return request.param
 

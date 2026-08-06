@@ -10,7 +10,7 @@ from torch import Tensor
 
 from tgm.util.logging import _get_logger, _logged_cached_property, log_latency
 
-from ._storage import DGSliceTracker, DGStorageBase, get_dg_storage_backend
+from ._storage import DGSliceTracker, DGStorageBase, resolve_dg_storage_backend
 from .batch import DGBatch
 from .timedelta import TimeDeltaDG
 
@@ -61,12 +61,14 @@ class DGraph:
         device: str | torch.device = 'cpu',
         storage_backend: Optional[Type[DGStorageBase]] = None,
     ) -> None:
-        from tgm.data import DGData  # Avoid circular dependency
+        from tgm.data import DGData, TGUFData  # Avoid circular dependency
 
-        if not isinstance(data, DGData):
-            raise TypeError(f'DGraph must be initialized with DGData, got {type(data)}')
+        if not isinstance(data, (DGData, TGUFData)):
+            raise TypeError(
+                f'DGraph must be initialized with DGData or TGUFData, got {type(data)}'
+            )
 
-        backend_cls = storage_backend or get_dg_storage_backend()
+        backend_cls = storage_backend or resolve_dg_storage_backend(data)
         self._time_delta = data.time_delta
         self._storage = backend_cls(data)
         self._device = torch.device(device)

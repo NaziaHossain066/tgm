@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional, Set, Tuple
+from typing import Any, Optional, Set, Tuple
 
 from torch import Tensor
 
@@ -19,6 +19,11 @@ class DGSliceTracker:
 
 class DGStorageBase(ABC):
     """Base class for dynamic graph storage engines."""
+
+    @classmethod
+    def accepts(cls, data: Any) -> bool:
+        """True if this backend must be auto-selected for `data`, bypassing the global default."""
+        return False
 
     @abstractmethod
     def __init__(self, data: 'DGData') -> None:  # type: ignore
