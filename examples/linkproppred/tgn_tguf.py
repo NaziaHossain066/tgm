@@ -193,14 +193,7 @@ seed_everything(args.seed)
 evaluator = Evaluator(name=args.dataset)
 
 full_data = TGUFData.from_tguf(args.tguf_path, time_delta='s')
-ts, vs, tst = (
-    full_data.store.train_split,
-    full_data.store.val_split,
-    full_data.store.test_split,
-)
-train_data = full_data.slice(ts.start, ts.end)
-val_data = full_data.slice(vs.start, vs.end)
-test_data = full_data.slice(tst.start, tst.end)
+train_data, val_data, test_data = full_data.split()
 
 train_dg = DGraph(train_data, device=args.device, storage_backend=DGStorageTGUFBackend)
 val_dg = DGraph(val_data, device=args.device, storage_backend=DGStorageTGUFBackend)
