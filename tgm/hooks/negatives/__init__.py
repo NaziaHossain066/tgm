@@ -1,7 +1,11 @@
-from .sampler import RandomNegativeEdgeSamplerHook, HistoricalNegativeEdgeSamplerHook
-from .tgb_sampler import (
-    TGBNegativeEdgeSamplerHook,
+from .heterogeneous_sampler import (
     TGBTHGNegativeEdgeSamplerHook,
-    TGBTKGNegativeEdgeSamplerHook,
+    NodeTypeNegativeSamplerHook,
+)
+from .knowledge_sampler import TGBTKGNegativeEdgeSamplerHook
+from .homogeneous_sampler import (
+    RandomNegativeEdgeSamplerHook,
+    HistoricalNegativeEdgeSamplerHook,
+    TGBNegativeEdgeSamplerHook,
 )
 from .tguf_sampler import TGUFPrecomputedNegativeEdgeSamplerHook

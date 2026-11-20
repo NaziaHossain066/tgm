@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Set, Tuple
+from typing import Any, Dict, Literal, Optional, Set, Tuple
 
 import numpy as np
 import torch
@@ -241,12 +241,15 @@ class DGStorageTGUFBackend(DGStorageBase):
                 pos_hi = min(pos_hi, slice.end_idx)
             pos_lo = max(0, min(pos_lo, self._E + self._R))
             pos_hi = max(pos_lo, min(pos_hi, self._E + self._R))
-            r_lo, r_hi = self._labels_before_pos(pos_lo), self._labels_before_pos(pos_hi)
+            r_lo, r_hi = (
+                self._labels_before_pos(pos_lo),
+                self._labels_before_pos(pos_hi),
+            )
             e_lo, e_hi = pos_lo - r_lo, pos_hi - r_hi
 
         return e_lo, max(e_lo, e_hi), r_lo, max(r_lo, r_hi)
 
-    def _time_bound(self, t: int, side: str) -> Tuple[int, int]:
+    def _time_bound(self, t: int, side: Literal['left', 'right']) -> Tuple[int, int]:
         """(edges, label rows) with time < t (side='left') or <= t (side='right')."""
         key = (t, side)
         if key not in self._time_cache:
